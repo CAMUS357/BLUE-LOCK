@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLUE LOCK - Consulta y Registro de RIF</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            transition: height 0.5s ease;
+            overflow: hidden;
+        }
+        h1 {
+            text-align: center;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+        }
+        .registro {
+            display: none;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>BLUE LOCK</h1>
+        <input type="text" id="rif" placeholder="Ingresa el número del RIF">
+        <button onclick="buscarRIF()">Consultar</button>
+        <div class="result" id="result"></div>
+        <button id="registrarBtn" onclick="toggleRegistro()">Registrar RIF</button>
+        <div class="registro" id="registro">
+            <input type="text" id="rifRegistro" placeholder="Número del RIF">
+            <input type="text" id="nombre" placeholder="Nombre de la empresa">
+            <input type="text" id="direccion" placeholder="Dirección">
+            <input type="text" id="telefono" placeholder="Teléfono">
+            <input type="date" id="fechaDeclaracion" placeholder="Fecha de declaración">
+            <button onclick="registrarRIF()">Registrar</button>
+            <div class="result" id="registroResult"></div>
+        </div>
+    </div>
+    <script>
+        // Inicialización de datosRIF
+        let datosRIF = {};
+
+        // Cargar los datos desde localStorage al iniciar la página
+        window.onload = function() {
+            cargarDatos();
+        };
+
+        function cargarDatos() {
+            const datosGuardados = localStorage.getItem('datosRIF');
+            if (datosGuardados) {
+                datosRIF = JSON.parse(datosGuardados);
+            }
+        }
+
+        function guardarDatos() {
+            localStorage.setItem('datosRIF', JSON.stringify(datosRIF));
+        }
+
+        function buscarRIF() {
+            const rif = document.getElementById('rif').value;
+            const resultDiv = document.getElementById('result');
+
+            if (rif in datosRIF) {
+                const datos = datosRIF[rif];
+                resultDiv.innerHTML = `<strong>Nombre:</strong> ${datos.nombre}<br>
+                                       <strong>Dirección:</strong> ${datos.direccion}<br>
+                                       <strong>Teléfono:</strong> ${datos.telefono}<br>
+                                       <strong>Fecha de declaración:</strong> ${datos.fechaDeclaracion}`;
+            } else {
+                resultDiv.innerHTML = "No se encontraron datos para el RIF ingresado.";
+            }
+        }
+
+        function toggleRegistro() {
+            const registroDiv = document.getElementById('registro');
+            const containerDiv = document.querySelector('.container');
+            const registrarBtn = document.getElementById('registrarBtn');
+
+            if (registroDiv.style.display === "none" || registroDiv.style.display === "") {
+                registroDiv.style.display = "block";
+                containerDiv.style.height = "auto"; // Permite que el contenedor se expanda automáticamente
+                registrarBtn.innerHTML = "Ocultar Registro";
+            } else {
+                registroDiv.style.display = "none";
+                containerDiv.style.height = "auto"; // Redimensiona automáticamente
+                registrarBtn.innerHTML = "Registrar RIF";
+            }
+        }
+
+        function registrarRIF() {
+            const rif = document.getElementById('rifRegistro').value;
+            const nombre = document.getElementById('nombre').value;
+            const direccion = document.getElementById('direccion').value;
+            const telefono = document.getElementById('telefono').value;
+            const fechaDeclaracion = document.getElementById('fechaDeclaracion').value;
+            const registroResultDiv = document.getElementById('registroResult');
+
+            if (rif && nombre && direccion && telefono && fechaDeclaracion) {
+                datosRIF[rif] = { nombre, direccion, telefono, fechaDeclaracion };
+                guardarDatos();
+                registroResultDiv.innerHTML = "Registro exitoso.";
+            } else {
+                registroResultDiv.innerHTML = "Por favor, complete todos los campos.";
+            }
+        }
+
+        // Inicialmente cargar datos desde localStorage
+        cargarDatos();
+    </script>
+</body>
+</html>
